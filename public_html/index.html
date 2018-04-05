@@ -230,40 +230,21 @@ Creative Commons Namensnennung 4.0 International Lizenz.
                 onMessageArrived(mqttMessage) {
                     let message = JSON.parse(mqttMessage.payloadString);
 
-                    // TODO: Anzeige aktualisieren
-                    //
-                    // Hierfür muss der im JSON mitgesendete Nachrichtentyp
-                    // ausgewertet werden.
-                    //
-                    // VEHICLE_READY: this.addVehicle(message) aufrufen
-                    // CONNECTION_LOST: this.removeVehicle(message) aufrufen
-                    // SENSOR_DATA: this.updateVehicle(message) aufrufen
-                    let logMessage = mqttMessage.destinationName + ": " + mqttMessage.payloadString;
-                    this.appendJsonLog(logMessage);
-                    
-                    // Statusmeldungen anzeigen
-                    if (message.type === "STATUS") {
-                        this.appendStatusLog(message.text);
-                    }
-                    
                     // Schaubilder aktualisieren
-                    if (message.type === "VALUE") {
-                        switch (message.destinationName) {
-                            case this.topicTemp1:
-                                this.updateTemp1Graph(message);
-                                break;
-                            case this.topicTemp2:
-                                this.updateTemp2Graph(message);
-                                break;
-                            case this.topicBlinds:
-                                this.updateBlindsGraph(message);
-                                break;
-                            case this.topicLight:
-                                this.updateLightGraph(message);
-                                break;
-                        }
+                       switch (message.type) {
+                        case "SENSOR_DATA":
+                    this.updateVehicle(message);    
+                    break;
+                      case "CONNECTION_LOST":
+                      this.removeVehicle(message);
+                      break;
+                     case "VEHICLE_READY":
+                      this.addVehicle(message);
+                      break;
                     }
                 }
+
+            
 
                 /**
                  * Neues Fahrzeug der Anzeige hinzufügen.
@@ -303,6 +284,7 @@ Creative Commons Namensnennung 4.0 International Lizenz.
                     marker.setId(message.vehicleId);
                     this.mapMarkerLayer.getSource().addFeature(marker);
                 }
+           
 
                 /**
                  * Fahrzeug aus der Anzeige entfernen.
